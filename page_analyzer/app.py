@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
@@ -8,4 +8,4 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 @app.route("/")
 def index():
-    return "Hello, world!"
+    return render_template("index.html")
