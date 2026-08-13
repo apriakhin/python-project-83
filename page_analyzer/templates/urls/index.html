@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Сайты | Анализатор страниц
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-5 py-3">
+	<h1 class="mb-2">Сайты</h1>
+
+	<div class="table-responsive">
+		<table class="table table-bordered" data-test="urls">
+			<thead>
+				<tr>
+					<th scope="col">ID</th>
+					<th scope="col">Имя</th>
+					<th scope="col">Последняя проверка</th>
+					<th scope="col">Код ответа</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				{% for url in urls %}
+				<tr>
+					<td>{{ url.id }}</td>
+					<td>
+						<a href="{{ url_for('urls_show', id=url.id) }}">
+							{{ url.name }}
+						</a>
+					</td>
+					<td></td>
+					<td></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}
