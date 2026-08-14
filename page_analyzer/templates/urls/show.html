@@ -27,13 +27,13 @@
 
 	<h2>Проверки</h2>
 
-	<form class="mb-2">
+	<form action="{{ url_for('urls_checks_post', id=url.id) }}" method="post" class="mb-2">
 		<button type="submit" class="btn btn-primary">
 			Запустить проверку
 		</button>
 	</form>
 
-	<table class="table table-bordered">
+	<table class="table table-bordered" data-test="checks">
 		<thead>
 			<tr>
 				<th>ID</th>
@@ -45,7 +45,18 @@
 			</tr>
 		</thead>
 
-		<tbody></tbody>
+		<tbody>
+			{% for check in checks %}
+                <tr>
+                    <td>{{ check.id }}</td>
+                    <td>{{ check.status_code or '' }}</td>
+                    <td>{{ check.h1 or '' }}</td>
+                    <td>{{ check.title or '' }}</td>
+                    <td>{{ check.description or '' }}</td>
+                    <td>{{ check.created_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+            {% endfor %}
+		</tbody>
 	</table>
 </div>
 {% endblock %}

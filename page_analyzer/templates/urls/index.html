@@ -28,8 +28,8 @@
 							{{ url.name }}
 						</a>
 					</td>
-					<td></td>
-					<td></td>
+					<td>{{ url.last_check.strftime('%Y-%m-%d') or '' }}</td>
+					<td>{{ url.status_code or '' }}</td>
 				</tr>
 				{% endfor %}
 			</tbody>

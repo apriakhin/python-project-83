@@ -32,7 +32,7 @@ def index():
 
 @app.get("/urls")
 def urls_index():
-    urls = repo.get_content()
+    urls = repo.get_urls()
     return render_template("urls/index.html", urls=urls)
 
 
@@ -46,7 +46,7 @@ def urls_post():
         return redirect(url_for("index")), 422
 
     try:
-        id = repo.create({"name": url})
+        id = repo.create_url({"name": url})
         flash("Страница успешно добавлена", "success")
         return redirect(url_for("urls_show", id=id))
 
@@ -57,10 +57,29 @@ def urls_post():
 
 @app.get("/urls/<int:id>")
 def urls_show(id):
-    url = repo.find(id)
+    url = repo.find_url(id)
 
     if not url:
         abort(404)
 
-    return render_template("urls/show.html", url=url)
+    checks = repo.find_checks(id)
+
+    return render_template("urls/show.html", url=url, checks=checks)
+
+
+@app.post("/urls/<int:id>/checks")
+def urls_checks_post(id):
+    try:
+        repo.create_check({
+            "url_id": id, 
+            "status_code": None, 
+            "h1": None, 
+            "title": None, 
+            "description": None
+        })
+        flash("Страница успешно проверена", "success")
+        return redirect(url_for("urls_show", id=id))
     
+    except ValueError as error:
+        flash(str(error), "danger")
+        return redirect(url_for("urls_show", id=id))
