@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 import psycopg
 from dotenv import load_dotenv
@@ -44,16 +45,17 @@ def urls_post():
 
     if error:
         flash(error, "danger")
-        return redirect(url_for("index")), 422
+        return render_template("index.html"), 422
 
-    try:
-        id = repo.create_url({"name": url})
-        flash("Страница успешно добавлена", "success")
-        return redirect(url_for("urls_show", id=id))
+    normalized_url = _normalize_url(url)
+    existing_url = repo.find_url_by_name(normalized_url)
+    if existing_url:
+        flash('Страница уже существует', 'info')
+        return redirect(url_for("urls_show", id=existing_url['id']))
 
-    except ValueError as error:
-        flash(str(error), "danger")
-        return redirect(url_for("index"))
+    id = repo.create_url({"name": normalized_url})
+    flash("Страница успешно добавлена", "success")
+    return redirect(url_for("urls_show", id=id))
 
 
 @app.get("/urls/<int:id>")
@@ -80,3 +82,9 @@ def urls_checks_post(id):
     except ValueError as error:
         flash(str(error), "danger")
         return redirect(url_for("urls_show", id=id))
+
+
+def _normalize_url(url):
+    parsed = urlparse(url)
+
+    return f'{parsed.scheme}://{parsed.netloc}'

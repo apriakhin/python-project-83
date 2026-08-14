@@ -1,4 +1,3 @@
-from psycopg.errors import UniqueViolation
 from psycopg.rows import dict_row
 
 
@@ -24,13 +23,18 @@ class UrlRepository:
                     ORDER BY created_at DESC
                     LIMIT 1
                 ) AS checks ON TRUE
-                ORDER BY urls.id DESC;
+                ORDER BY urls.created_at DESC;
             """)
             return cur.fetchall()
 
     def find_url(self, id):
         with self.conn.cursor(row_factory=dict_row) as cur:
             cur.execute("SELECT * FROM urls WHERE id = %s", (id,))
+            return cur.fetchone()
+
+    def find_url_by_name(self, name):
+        with self.conn.cursor(row_factory=dict_row) as cur:
+            cur.execute("SELECT * FROM urls WHERE name = %s", (name,))
             return cur.fetchone()
 
     def find_checks(self, url_id):
@@ -50,9 +54,9 @@ class UrlRepository:
             self.conn.commit()
             return url_data["id"]
 
-        except UniqueViolation:
+        except Exception:
             self.conn.rollback()
-            raise ValueError('Страница уже существует')
+            return None
 
     def create_check(self, check_data):
         try:
@@ -80,7 +84,6 @@ class UrlRepository:
             self.conn.commit()
             return check_data["id"]
         
-        except Exception as error:
-            print(error)
+        except Exception:
             self.conn.rollback()
-            raise ValueError('Произошла ошибка при проверке')
+            return None
