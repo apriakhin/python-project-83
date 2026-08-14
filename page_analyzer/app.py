@@ -12,6 +12,7 @@ from flask import (
     url_for,
 )
 
+from .analyzer import anaylyze_page
 from .url_repository import UrlRepository
 from .validator import validate_url
 
@@ -70,13 +71,9 @@ def urls_show(id):
 @app.post("/urls/<int:id>/checks")
 def urls_checks_post(id):
     try:
-        repo.create_check({
-            "url_id": id, 
-            "status_code": None, 
-            "h1": None, 
-            "title": None, 
-            "description": None
-        })
+        url_data = repo.find_url(id)
+        check_data = anaylyze_page(url_data)
+        repo.create_check(check_data)
         flash("Страница успешно проверена", "success")
         return redirect(url_for("urls_show", id=id))
     
